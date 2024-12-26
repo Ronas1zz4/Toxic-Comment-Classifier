@@ -1,10 +1,13 @@
 # pip install google-api-python-client
 import googleapiclient.discovery
 import pandas as pd
+import os
+
+google_api_key = os.getenv('GOOGLE_API_KEY')
 
 api_service_name = "youtube"
 api_version = "v3"
-DEVELOPER_KEY = "AIzaSyCX4SzpyBDer0HBAjjnIVAJF9rXbE605Gk"
+
 
 youtube = googleapiclient.discovery.build(
     api_service_name, api_version, developerKey=DEVELOPER_KEY)

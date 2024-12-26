@@ -10,6 +10,7 @@ from nltk.stem import PorterStemmer, WordNetLemmatizer
 import joblib
 import numpy as np
 from django.http import JsonResponse
+import os
 
 
 
@@ -60,8 +61,8 @@ def svm(request):
 
 
 
-def get_youtube_comments(api_key, video_id, max_results=30):
-    youtube = build("youtube", "v3", developerKey=api_key)
+def get_youtube_comments(google_api_key, video_id, max_results=30):
+    youtube = build("youtube", "v3", developerKey= google_api_key)
 
     request = youtube.commentThreads().list(
         part="snippet",
@@ -97,15 +98,13 @@ def fetch_comments(request):
         video_url = request.POST.get('video_url', None)
         if video_url:
             video_id = extract_video_id(video_url)
-            api_key = "AIzaSyCw7KvWAHPK1SHA3tyEM2f2JcWbZ6jcEd0" 
-            comments = get_youtube_comments(api_key, video_id)
+            comments = get_youtube_comments( video_id)
             return render(request, 'home.html', {'comments': comments})
     else:
         return render(request, 'home.html')
 
 #SVM-Classification
 def display_comments(request, video_id=None):
-    api_key = "AIzaSyCw7KvWAHPK1SHA3tyEM2f2JcWbZ6jcEd0"
     comments= []
     comments_df = pd.DataFrame(columns=['author', 'published_at', 'updated_at', 'like_count', 'text'])
     # comments_df.head(10)
@@ -119,7 +118,7 @@ def display_comments(request, video_id=None):
     prediction_list = []
     
     if video_id:
-        comments = get_youtube_comments(api_key, video_id)
+        comments = get_youtube_comments(google_api_key, video_id)
         
         
                 
@@ -168,7 +167,7 @@ def display_comments(request, video_id=None):
 
 
 def classify_comments(request, video_id= None):
-    api_key = "AIzaSyCw7KvWAHPK1SHA3tyEM2f2JcWbZ6jcEd0"
+    google_api_key = os.getenv('GOOGLE_API_KEY')
     comments= []
     comments_df = pd.DataFrame(columns=['author', 'published_at', 'updated_at', 'like_count', 'text'])
     # comments_df.head(10)
@@ -182,7 +181,7 @@ def classify_comments(request, video_id= None):
         
     classification_list = []
     if video_id:
-        comments = get_youtube_comments(api_key, video_id)
+        comments = get_youtube_comments(google_api_key, video_id)
         
         
                 
